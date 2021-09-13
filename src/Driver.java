@@ -2,24 +2,23 @@ import java.util.*;
 
 public class Driver {
     public static void main(String[] args){
+        int result = 0;
+        int right = 0;
+        int operatorFlag = 0;
         List<Character> operators = Arrays.asList('+', '-', '*', '/');
+
         System.out.println("Thank you for using THCalculator v1. Please enter: ");
         Scanner sc = new Scanner(System.in);
         String input = sc.nextLine();
         input = input.replace(" ", "");
-        int result = 0;
-        int right = 0;
-        int operatorFlag = 0;
+        if (!validate(input))
+            right = -1;
 
-        while(right < input.length()){
+        while(right >= 0 && right < input.length()){
             char ch = input.charAt(right);
-            if(!Character.isDigit(ch) && !operators.contains(ch)){
-                System.out.println("Invalid input");
-                break;
-            }
 
             int left = right;
-            while(right != input.length() && Character.isDigit(input.charAt(right))){
+            while(right < input.length() && (Character.isDigit(input.charAt(right)) || input.charAt(right) == '-')){
                 right++;
             }
 
@@ -46,6 +45,70 @@ public class Driver {
             right++;
         }
 
-        System.out.println(result);
+        if(right != -1)
+            System.out.println(result);
+    }
+
+    public static boolean validate(String input){
+        List<Character> validSymbols = Arrays.asList('+', '*', '/');
+        int index = 0;
+        int symbolsInRow = 0;
+        int minusInRow = 0;
+
+        while(index < input.length()){
+            char ch = input.charAt(index);
+
+            //case #1: trigger for invalid characters
+            if(!Character.isDigit(ch) && !validSymbols.contains(ch) && ch != '-') {
+                System.out.println("Invalid Input");
+                return false;
+            }
+
+            //case #2: trigger if first or last char is non-number or '-
+            if((index == 0 || index == input.length()-1) && validSymbols.contains(ch)){
+                System.out.println("Invalid Syntax2");
+                return false;
+            }
+
+            if(validSymbols.contains(ch))
+                symbolsInRow++;
+            else
+                symbolsInRow = 0;
+
+            //case #3: trigger if there are two operators in a row
+            if(symbolsInRow == 2){
+                System.out.println("Invalid Syntax3");
+                return false;
+            }
+
+            //case #4: trigger if there is an incorrect placement of '-'
+            if(ch == '-'){
+                //last char cannot be negative
+                //next char after '-' must be another '-' or a digit
+                //first two char cannot be '-'
+                if(index == input.length()-1){
+                    System.out.println("Invalid Syntax4a");
+                    return false;
+                }if(input.charAt(index+1) != '-' && !Character.isDigit(input.charAt(index+1))){
+                    System.out.println("Invalid Syntax4b");
+                    return false;
+                }
+                if(index == 1 && minusInRow == 1){
+                    System.out.println("Invalid Syntax4c");
+                    return false;
+                }
+                minusInRow++;
+            }else
+                minusInRow = 0;
+
+            //case #5: trigger if there are three '-' in a row
+            if(minusInRow == 3){
+                System.out.println("Invalid Syntax5");
+                return false;
+            }
+
+            index++;
+        }
+        return true;
     }
 }
