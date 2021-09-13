@@ -18,20 +18,24 @@ public class Driver {
             char ch = input.charAt(right);
 
             int left = right;
-            while(right < input.length() && (Character.isDigit(input.charAt(right)) || input.charAt(right) == '-')){
+            if(ch == '-')
+                right++;
+            while(right < input.length() && Character.isDigit(input.charAt(right))){
                 right++;
             }
 
-            if(operatorFlag == 0){
-                result += Integer.parseInt(input.substring(left, right));
-            }else if(operatorFlag == 1){
-                result -= Integer.parseInt(input.substring(left, right));
-            }else if(operatorFlag == 2)
-                result *= Integer.parseInt(input.substring(left, right));
-            else if(operatorFlag == 3)
-                result /= Integer.parseInt(input.substring(left, right));
+            int operand = Integer.parseInt(input.substring(left, right));
 
-            if(right != input.length() && operators.contains(input.charAt(right))){
+            if(operatorFlag == 0){
+                result += operand;
+            }else if(operatorFlag == 1){
+                result -= operand;
+            }else if(operatorFlag == 2)
+                result *= operand;
+            else if(operatorFlag == 3)
+                result /= operand;
+
+            if(right != input.length()){
                 char sym = input.charAt(right);
                 if(sym == '+')
                     operatorFlag = 0;
