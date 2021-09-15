@@ -55,6 +55,7 @@ public class Driver {
             System.out.println(result);
     }
 
+    //input validation
     public static boolean validate(String input){
         List<Character> validSymbols = Arrays.asList('+', '*', '/');
         int index = 0;
@@ -118,25 +119,11 @@ public class Driver {
         return true;
     }
 
+    //evaluate the multiplication and division first
     public static String pemdas(String input){
-        String finalString = "";
+        String output = "";
         int right = 0;
         List<Character> validSymbols = Arrays.asList('+', '*', '/');
-
-        List<Character> symbolList = new ArrayList<>();
-        for(int i = 0; i < input.length(); i++){
-            char ch = input.charAt(i);
-
-            if(validSymbols.contains(ch))
-                symbolList.add(ch);
-            else if(i == 0 && ch == '-')
-                continue;
-            else if(ch == '-' && Character.isDigit(input.charAt(i-1)) && Character.isDigit(input.charAt(i+1)))
-                symbolList.add(ch);
-            else if(ch == '-' && input.charAt(i+1) == '-'){
-                symbolList.add('-');
-            }
-        }
 
         while(right < input.length()){
             char ch = input.charAt(right);
@@ -149,16 +136,21 @@ public class Driver {
             }
             int operand = Integer.parseInt(input.substring(left, right));
 
+            //add the last character in input string
             if(right == input.length()){
-                finalString += operand;
+                output += operand;
                 break;
             }
 
+            //look at the operator on the right to two cases
+            //case 1: (+) and (-) will be left alone
+            //case 2: (*) and (/) will calculate the current operand and the next operand on the right
             if(input.charAt(right) == '+') {
-                finalString += operand+ "+";
+                output += operand+ "+";
             }else if(input.charAt(right) == '-'){
-                finalString += operand + "-";
-            }else if(input.charAt(right) == '*'){
+                output += operand + "-";
+            }else{
+                char operator = input.charAt(right);
                 right++;
 
                 left = right;
@@ -168,32 +160,16 @@ public class Driver {
                     right++;
                 }
                 int second_operand = Integer.parseInt(input.substring(left, right));
-                operand *= second_operand;
-                finalString += operand;
-                if(right < input.length()){
-                    finalString += input.charAt(right);
-                }
-
-
-            }else if(input.charAt(right) == '/'){
-                right++;
-
-                left = right;
-                if(ch == '-')
-                    right++;
-                while(right < input.length() && Character.isDigit(input.charAt(right))){
-                    right++;
-                }
-                int second_operand = Integer.parseInt(input.substring(left, right));
-                operand /= second_operand;
-                finalString += operand;
+                if(operator == '*')
+                    operand *= second_operand;
+                else
+                    operand /= second_operand;
+                output += operand;
                 if(right < input.length())
-                    finalString += input.charAt(right);
+                    output += input.charAt(right);
             }
-
             right++;
         }
-
-        return finalString;
+        return output;
     }
 }
