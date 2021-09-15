@@ -2,7 +2,7 @@ import java.util.*;
 
 public class Driver {
     public static void main(String[] args){
-        int result = 0;
+        double result = 0;
         int right = 0;
         int operatorFlag = 0;
 
@@ -17,18 +17,17 @@ public class Driver {
             input = pemdas(input);
 
         while(right >= 0 && right < input.length()){
-            char ch = input.charAt(right);
-
+            //parse the operand
             int left = right;
-            if(ch == '-')
+            if(input.charAt(right) == '-')
                 right++;
-            while(right < input.length() && Character.isDigit(input.charAt(right))){
+            while(right < input.length() && (Character.isDigit(input.charAt(right)) || input.charAt(right) == '.'))
                 right++;
-            }
-            int operand = Integer.parseInt(input.substring(left, right));
+
+            double operand = Double.parseDouble(input.substring(left, right));
 
             //depending on the operatorFlag, calculate the new result
-            //for the first number, the operatorFlag is set to add (to 0)
+            //for the first number, the operatorFlag is set to add to inital value of 0
             if(operatorFlag == 0){
                 result += operand;
             }else if(operatorFlag == 1){
@@ -63,19 +62,20 @@ public class Driver {
         int index = 0;
         int symbolsInRow = 0;
         int minusInRow = 0;
+        int decimalInRow = 0;
 
         while(index < input.length()){
             char ch = input.charAt(index);
 
             //case #1: trigger for invalid characters
-            if(!Character.isDigit(ch) && !validSymbols.contains(ch) && ch != '-') {
+            if(!Character.isDigit(ch) && !validSymbols.contains(ch) && ch != '-' && ch != '.') {
                 System.out.println("Invalid Input");
                 return false;
             }
 
-            //case #2: trigger if first or last char is non-number or '-
+            //case #2: trigger if first or last char is non-number
             if((index == 0 || index == input.length()-1) && validSymbols.contains(ch)){
-                System.out.println("Invalid Syntax2");
+                System.out.println("Invalid Syntax");
                 return false;
             }
 
@@ -84,37 +84,53 @@ public class Driver {
             else
                 symbolsInRow = 0;
 
-            //case #3: trigger if there are two operators in a row
+            //case #3: trigger if there are two operators in a row (excluding '-')
             if(symbolsInRow == 2){
-                System.out.println("Invalid Syntax3");
+                System.out.println("Invalid Syntax");
                 return false;
             }
 
             //case #4: trigger if there is an incorrect placement of '-'
+            //there cannot be three '-' in a row
+            //last char cannot be '-'
+            //next char after '-' must be another '-', '.', or a number
+            //first two char cannot be '-'
             if(ch == '-'){
-                //last char cannot be negative
-                //next char after '-' must be another '-' or a digit
-                //first two char cannot be '-'
-                if(index == input.length()-1){
-                    System.out.println("Invalid Syntax4a");
+                if(minusInRow == 2){
+                    System.out.println("Invalid Syntax");
                     return false;
-                }if(input.charAt(index+1) != '-' && !Character.isDigit(input.charAt(index+1))){
-                    System.out.println("Invalid Syntax4b");
+                }if(index == input.length()-1){
+                    System.out.println("Invalid Syntax");
                     return false;
-                }
-                if(index == 1 && minusInRow == 1){
-                    System.out.println("Invalid Syntax4c");
+                }if(input.charAt(index+1) != '-' && !Character.isDigit(input.charAt(index+1)) && input.charAt(index+1) != '.'){
+                    System.out.println("Invalid Syntax");
+                    return false;
+                }if(index == 1 && minusInRow == 1){
+                    System.out.println("Invalid Syntax");
                     return false;
                 }
                 minusInRow++;
             }else
                 minusInRow = 0;
 
-            //case #5: trigger if there are three '-' in a row
-            if(minusInRow == 3){
-                System.out.println("Invalid Syntax5");
-                return false;
-            }
+            //case #5: trigger if there is an incorrect placement of '.'
+            //there cannot be two decimal in a row
+            //last char cannot be decimal
+            //next char after '.' must be a digit
+            if(ch == '.'){
+                if(decimalInRow == 1){
+                    System.out.println("Invalid Syntax");
+                    return false;
+                }if(index == input.length()-1){
+                    System.out.println("Invalid Syntax");
+                    return false;
+                }if(!Character.isDigit(input.charAt(index+1))){
+                    System.out.println("Invalid Syntax");
+                    return false;
+                }
+                decimalInRow++;
+            }else
+                decimalInRow = 0;
 
             index++;
         }
@@ -127,15 +143,12 @@ public class Driver {
         int right = 0;
 
         while(right < input.length()){
-            char ch = input.charAt(right);
-
             int left = right;
-            if(ch == '-')
+            if(input.charAt(right) == '-')
                 right++;
-            while(right < input.length() && Character.isDigit(input.charAt(right))){
+            while(right < input.length() && (Character.isDigit(input.charAt(right)) || input.charAt(right) == '.'))
                 right++;
-            }
-            int operand = Integer.parseInt(input.substring(left, right));
+            double operand = Double.parseDouble(input.substring(left, right));
 
             //add the last character in input string
             if(right == input.length()){
@@ -155,17 +168,19 @@ public class Driver {
                 right++;
 
                 left = right;
-                if(ch == '-')
+                if(input.charAt(right) == '-')
                     right++;
-                while(right < input.length() && Character.isDigit(input.charAt(right))){
+                while(right < input.length() && (Character.isDigit(input.charAt(right)) || input.charAt(right) == '.'))
                     right++;
-                }
-                int second_operand = Integer.parseInt(input.substring(left, right));
+                double second_operand = Double.parseDouble(input.substring(left, right));
+
                 if(operator == '*')
                     operand *= second_operand;
                 else
                     operand /= second_operand;
+
                 output += operand;
+
                 if(right < input.length())
                     output += input.charAt(right);
             }
