@@ -5,12 +5,12 @@ public class Driver {
         int result = 0;
         int right = 0;
         int operatorFlag = 0;
-        List<Character> operators = Arrays.asList('+', '-', '*', '/');
 
         System.out.println("Thank you for using THCalculator v1. Please enter: ");
         Scanner sc = new Scanner(System.in);
         String input = sc.nextLine();
         input = input.replace(" ", "");
+
         if (!validate(input))
             right = -1;
         else
@@ -25,9 +25,10 @@ public class Driver {
             while(right < input.length() && Character.isDigit(input.charAt(right))){
                 right++;
             }
-
             int operand = Integer.parseInt(input.substring(left, right));
 
+            //depending on the operatorFlag, calculate the new result
+            //for the first number, the operatorFlag is set to add (to 0)
             if(operatorFlag == 0){
                 result += operand;
             }else if(operatorFlag == 1){
@@ -37,6 +38,7 @@ public class Driver {
             else if(operatorFlag == 3)
                 result /= operand;
 
+            //set the operatorFlag for the next loop
             if(right != input.length()){
                 char sym = input.charAt(right);
                 if(sym == '+')
@@ -123,7 +125,6 @@ public class Driver {
     public static String pemdas(String input){
         String output = "";
         int right = 0;
-        List<Character> validSymbols = Arrays.asList('+', '*', '/');
 
         while(right < input.length()){
             char ch = input.charAt(right);
